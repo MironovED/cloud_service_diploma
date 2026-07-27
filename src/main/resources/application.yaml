@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: cloud_service_diploma

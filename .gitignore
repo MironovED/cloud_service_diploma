@@ -1,0 +1,56 @@
+### IntelliJ IDEA ###
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+questions.txt
+.idea/
+.gigaide/
+target
+*.iml
+*.log
+logs
+
+#архивы
+*.7z
+*.gz
+*.tag
+*.tgz
+*.zip
+*.rar
+
+#библиотеки
+*.class
+*.dil
+*.ear
+*.jar
+*.so
+*.war
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+/.gitattributes
+/mvnw
+/mvnw.cmd
+/.mvn/wrapper/maven-wrapper.properties
