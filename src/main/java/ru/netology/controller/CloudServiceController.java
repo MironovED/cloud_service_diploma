@@ -1,15 +1,19 @@
 package ru.netology.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ru.netology.dto.Auth;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/cloud")
 public class CloudServiceController {
+    private CloudServiceController cloudServiceController;
+
+    public CloudServiceController(CloudServiceController cloudServiceController) {
+        this.cloudServiceController = cloudServiceController;
+    }
 
     /**
      * Авторизация по логину и паролю

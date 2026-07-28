@@ -1,9 +1,15 @@
 package ru.netology.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class Auth {
+
     /** Логин пользователя */
+    @NotBlank
     String login;
+
     /** Пароль пользователя*/
+    @NotBlank
     String password;
 
     public String getPassword() {
