@@ -1,7 +1,7 @@
 package ru.netology.service;
 
 import org.springframework.stereotype.Service;
-import ru.netology.dto.Auth;
+import ru.netology.entity.Auth;
 import ru.netology.exception.BadCredentialsException;
 import ru.netology.repository.CloudServiceRepository;
 

@@ -3,8 +3,8 @@ package ru.netology.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.netology.dto.Auth;
-import ru.netology.dto.AuthToken;
+import ru.netology.entity.Auth;
+import ru.netology.entity.AuthToken;
 import ru.netology.exception.BadCredentialsException;
 import ru.netology.service.CloudServiceService;
 
@@ -35,12 +35,12 @@ public class CloudServiceController {
 
     /**
      * Выход из текущий сессии клиента
-     * @param authToken     действующий токен
+     * @param token     действующий токен
      * @return
      */
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestHeader("auth-token") String authToken) {
-        cloudServiceService.logout(authToken);
+    public ResponseEntity<String> logout(@RequestHeader("auth-token") String token) {
+        cloudServiceService.logout(token);
         return new ResponseEntity<>("Success logout", HttpStatus.OK);
     }
 
