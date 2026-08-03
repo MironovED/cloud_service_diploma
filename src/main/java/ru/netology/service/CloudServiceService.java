@@ -2,6 +2,7 @@ package ru.netology.service;
 
 import org.springframework.stereotype.Service;
 import ru.netology.dto.Auth;
+import ru.netology.exception.BadCredentialsException;
 import ru.netology.repository.CloudServiceRepository;
 
 import java.security.SecureRandom;
@@ -22,10 +23,24 @@ public class CloudServiceService {
      * @return          токен в виде строки в 32 символа
      */
     public Optional<String> login(Auth auth) {
-        if(cloudServiceRepository.checkUser(auth)) {
-            return Optional.ofNullable(generateToken());
+        if (cloudServiceRepository.checkUser(auth)) {
+            var token = generateToken();
+            try {
+                cloudServiceRepository.addToken(token);
+                return Optional.ofNullable(token);
+            } catch (RuntimeException e) {
+                throw new BadCredentialsException();
+            }
         }
         return Optional.empty();
+    }
+
+    /**
+     * Метод удаления сохраненного токена авторизации
+     * @param token     действующий токен
+     */
+    public void logout(String token){
+        cloudServiceRepository.remoteToken(token);
     }
 
     /**
@@ -35,14 +50,11 @@ public class CloudServiceService {
     public String generateToken() {
         char[] charArray = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ".toCharArray();
         SecureRandom random = new SecureRandom();
-
         char[] token = new char[62];
-
         for(int i = 0; i < 62; i++) {
             int randomIndex = random.nextInt(32);
             token[i] = charArray[randomIndex];
         }
-
         return new String(token);
     }
 

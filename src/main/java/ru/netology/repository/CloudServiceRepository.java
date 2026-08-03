@@ -10,10 +10,18 @@ import java.util.Optional;
 public class CloudServiceRepository {
 
     public Boolean checkUser(Auth auth) {
-        return false;
+        return true;
     }
 
     public Boolean checkToken(AuthToken authToken) {
-        return false;
+        return true;
+    }
+
+    public void addToken(String token) {
+
+    }
+
+    public void remoteToken(String token) {
+
     }
 }

@@ -22,20 +22,26 @@ public class CloudServiceController {
     /**
      * Авторизация по логину и паролю
      * @param auth      получаем логин и пароль
-     * @return          токен авторизации
+     * @return          возвращаем токен авторизации в теле ответа
      */
     @PostMapping("/login")
     public ResponseEntity<AuthToken> authorization(@RequestBody Auth auth) {
-        var token = cloudServiceService.login(auth);
-        if(token.isEmpty()){
-            throw new BadCredentialsException();
-        }
+            var token = cloudServiceService.login(auth);
+            if(token.isEmpty()){
+                throw new BadCredentialsException();
+            }
         return new ResponseEntity<>(new AuthToken(token.get()), HttpStatus.OK);
     }
 
+    /**
+     * Выход из текущий сессии клиента
+     * @param authToken     действующий токен
+     * @return
+     */
     @PostMapping("/logout")
-    public ResponseEntity<String> logout() {
-        return null;
+    public ResponseEntity<String> logout(@RequestHeader("auth-token") String authToken) {
+        cloudServiceService.logout(authToken);
+        return new ResponseEntity<>("Success logout", HttpStatus.OK);
     }
 
     @PostMapping("/file")
