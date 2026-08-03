@@ -50,6 +50,7 @@ public class CloudServiceRepository {
      * @param token     действующий токен
      */
     public void remoteToken(String token) {
-        entityManager.remove(new AuthToken(token));
+        AuthToken authToken = entityManager.find(AuthToken.class, token);
+        entityManager.remove(authToken);
     }
 }
