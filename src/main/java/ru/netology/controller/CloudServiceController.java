@@ -1,28 +1,36 @@
 package ru.netology.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.netology.dto.Auth;
+import ru.netology.dto.AuthToken;
+import ru.netology.exception.BadCredentialsException;
+import ru.netology.service.CloudServiceService;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/cloud")
 public class CloudServiceController {
-    private CloudServiceController cloudServiceController;
+    private CloudServiceService cloudServiceService;
 
-    public CloudServiceController(CloudServiceController cloudServiceController) {
-        this.cloudServiceController = cloudServiceController;
+    public CloudServiceController(CloudServiceService cloudServiceService) {
+        this.cloudServiceService = cloudServiceService;
     }
 
     /**
      * Авторизация по логину и паролю
-     * @param auth
-     * @return
+     * @param auth      получаем логин и пароль
+     * @return          токен авторизации
      */
     @PostMapping("/login")
-    public ResponseEntity<String> authorization(@RequestBody Auth auth) {
-        return null;
+    public ResponseEntity<AuthToken> authorization(@RequestBody Auth auth) {
+        var token = cloudServiceService.login(auth);
+        if(token.isEmpty()){
+            throw new BadCredentialsException();
+        }
+        return new ResponseEntity<>(new AuthToken(token.get()), HttpStatus.OK);
     }
 
     @PostMapping("/logout")
