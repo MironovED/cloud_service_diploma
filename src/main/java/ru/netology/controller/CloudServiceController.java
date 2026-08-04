@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.*;
 import ru.netology.entity.Auth;
 import ru.netology.entity.AuthToken;
 import ru.netology.exception.BadCredentialsException;
+import ru.netology.exception.ErrorInputDataException;
+import ru.netology.exception.UnauthorizedErrorException;
+import ru.netology.pojo.FileInfo;
 import ru.netology.service.CloudServiceService;
 
 import java.util.List;
@@ -64,12 +67,21 @@ public class CloudServiceController {
         return null;
     }
 
+    /**
+     * Получение списка файлов в количестве, указанном в query параметре
+     * @param token     передаваемый токен в headers
+     * @param limit     лимит на получение файлов из БД
+     * @return          список файлов
+     */
     @GetMapping("/list")
-    public ResponseEntity<List<String>> getAllFiles(@RequestHeader("auth-token") String token,
-                                                    @RequestParam("limit") int limit
+    public ResponseEntity<List<FileInfo>> getAllFiles(@RequestHeader("auth-token") String token,
+                                                      @RequestParam(value = "limit", required = false) Integer limit
                                                     ) {
-
-        return null;
+        if (token == null ) {
+            throw new ErrorInputDataException();
+        }
+        var listFiles = cloudServiceService.getListFiles(token, limit);
+        return new ResponseEntity<>(listFiles, HttpStatus.OK);
     }
 
 }

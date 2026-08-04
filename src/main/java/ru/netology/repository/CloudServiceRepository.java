@@ -6,7 +6,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 import ru.netology.entity.Auth;
 import ru.netology.entity.AuthToken;
+import ru.netology.entity.File;
+import ru.netology.pojo.FileInfo;
 
+import java.util.List;
 import java.util.Optional;
 
 @Transactional
@@ -33,8 +36,24 @@ public class CloudServiceRepository {
         return result.isPresent();
     }
 
-    public Boolean checkToken(AuthToken authToken) {
-        return true;
+    /**
+     * Получить список объектов File из таблицы
+     * @return      List<File>
+     */
+    public List<File> getListFiles() {
+        String sqlQuery = "SELECT f FROM File f";
+        var query = entityManager.createQuery(sqlQuery, File.class);
+        return query.getResultList();
+    }
+
+    /**
+     * Метод проверки существования токена в таблице
+     * @param token     токен
+     * @return          true or false
+     */
+    public Boolean checkToken(String token) {
+        AuthToken authToken = entityManager.find(AuthToken.class, token);
+        return authToken != null;
     }
 
     /**
