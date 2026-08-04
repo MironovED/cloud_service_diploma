@@ -65,7 +65,10 @@ public class CloudServiceController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<String>> getAllFiles() {
+    public ResponseEntity<List<String>> getAllFiles(@RequestHeader("auth-token") String token,
+                                                    @RequestParam("limit") int limit
+                                                    ) {
+
         return null;
     }
 

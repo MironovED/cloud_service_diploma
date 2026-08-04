@@ -40,7 +40,7 @@ public class CloudServiceService {
      * @param token     действующий токен
      */
     public void logout(String token){
-        cloudServiceRepository.remoteToken(token);
+        cloudServiceRepository.remoteToken(getSplitToken(token));
     }
 
     /**
@@ -56,6 +56,16 @@ public class CloudServiceService {
             token[i] = charArray[randomIndex];
         }
         return new String(token);
+    }
+
+    /**
+     * Метод получения токена из значения хидера
+     * @param rawToken      необработанный токен из хидера
+     * @return              чистое значение токена
+     */
+    public String getSplitToken(String rawToken) {
+        String[] splitToken = rawToken.split(" ");
+        return splitToken[1];
     }
 
 }
