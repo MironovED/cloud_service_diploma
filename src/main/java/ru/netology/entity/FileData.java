@@ -5,35 +5,35 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "\"files\"", schema = "cloudservice")
-public class File {
+@Table(name = "\"filesdata\"", schema = "cloudservice")
+public class FileData {
     /** Хэш файла */
     @Id
     private String hash;
     /** Путь до файла в файловой системе */
-    private String file;
+    private String path;
 
-    public File() {
+    public FileData() {
     }
 
-    public File(String file, String hash) {
-        this.file = file;
+    public FileData(String hash, String file) {
         this.hash = hash;
+        this.path = file;
     }
 
     public String getHash() {
         return hash;
     }
 
-    public String getFile() {
-        return file;
+    public String getPath() {
+        return path;
     }
 
     public void setHash(String hash) {
         this.hash = hash;
     }
 
-    public void setFile(String file) {
-        this.file = file;
+    public void setPath(String path) {
+        this.path = path;
     }
 }

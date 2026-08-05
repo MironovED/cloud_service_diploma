@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Информация о файле, передаваемая клиенту
  */
-public class FileInfo {
+public class FileInfo {                 //todo переделать
     /** Имя файла, хранящийся в файловой системе */
     @JsonProperty("filename")
     private String fileName;

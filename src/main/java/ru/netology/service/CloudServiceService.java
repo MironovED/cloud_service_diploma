@@ -1,23 +1,19 @@
 package ru.netology.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ru.netology.entity.Auth;
-import ru.netology.entity.File;
-import ru.netology.exception.BadCredentialsException;
-import ru.netology.exception.ErrorGetFilesException;
-import ru.netology.exception.UnauthorizedErrorException;
+import ru.netology.entity.FileData;
+import ru.netology.exception.*;
 import ru.netology.pojo.FileInfo;
 import ru.netology.repository.CloudServiceRepository;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 
 @Service
 public class CloudServiceService {
@@ -54,6 +50,35 @@ public class CloudServiceService {
     }
 
     /**
+     * Сохранить файл в БД
+     * @param rawToken      токен
+     * @param fileName      имя файла
+     * @param file          файл
+     */
+    public void saveFile(String rawToken, String fileName, MultipartFile file){
+        if(!checkToken(getSplitToken(rawToken))) {
+            throw new UnauthorizedErrorException();
+        }
+            cloudServiceRepository.saveFile(file, fileName);
+    }
+
+    public FileData getFile(String rawToken, String fileName) {
+        if(!checkToken(getSplitToken(rawToken))) {
+            throw new UnauthorizedErrorException();
+        }
+        FileData file;
+        try {
+            file = cloudServiceRepository.getFileByFileName(fileName);
+            if (file == null) {
+                throw new ErrorUploadFileException();
+            }
+            return file;
+        } catch (RuntimeException e) {
+            throw new ErrorUploadFileException();
+        }
+    }
+
+    /**
      * получить список файлов
      * @param rawToken      токен
      * @param limit         количество выводимых объектов
@@ -61,21 +86,25 @@ public class CloudServiceService {
      */
     public List<FileInfo> getListFiles(String rawToken, Integer limit) {
         List<FileInfo> listFileInfo = new ArrayList<>();
-        String token = getSplitToken(rawToken);
-        if(!checkToken(token)) {
+        if(!checkToken(getSplitToken(rawToken))) {
             throw new UnauthorizedErrorException();
         }
-        var listFile = cloudServiceRepository.getListFiles();
-        if(listFile.isEmpty()) {
+        List<FileData> listFile;
+        try {
+            listFile = cloudServiceRepository.getListFiles();
+            if(listFile.isEmpty()) {
+                throw new ErrorGetFilesException();
+            }
+            for (FileData file : listFile) {
+                listFileInfo.add(convertFromFileToFileInfo(file));
+            }
+            if(limit != null) {
+                listFileInfo = listFileInfo.stream().limit(3).toList();
+            }
+            return listFileInfo;
+        } catch (RuntimeException e) {
             throw new ErrorGetFilesException();
         }
-        for (File file : listFile) {
-            listFileInfo.add(convertFromFileToFileInfo(file));
-        }
-        if(limit != null) {
-            listFileInfo = listFileInfo.stream().limit(3).toList();
-        }
-        return listFileInfo;
     }
 
     /**
@@ -83,13 +112,9 @@ public class CloudServiceService {
      * @param file      объект File
      * @return          объект FileInfo
      */
-    public FileInfo convertFromFileToFileInfo(File file) {
-        Path path = Paths.get(file.getFile());
-        try {
-            return new FileInfo(path.getFileName().toString(), (int) Files.size(path));
-        } catch (IOException e){
-            throw new ErrorGetFilesException();
-        }
+    public FileInfo convertFromFileToFileInfo(FileData file) {
+        File currentFile = new File(file.getPath());
+        return new FileInfo(currentFile.getName(), (int)currentFile.length());
     }
 
     /**

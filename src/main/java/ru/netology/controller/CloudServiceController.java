@@ -3,11 +3,12 @@ package ru.netology.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.netology.entity.Auth;
 import ru.netology.entity.AuthToken;
+import ru.netology.entity.FileData;
 import ru.netology.exception.BadCredentialsException;
 import ru.netology.exception.ErrorInputDataException;
-import ru.netology.exception.UnauthorizedErrorException;
 import ru.netology.pojo.FileInfo;
 import ru.netology.service.CloudServiceService;
 
@@ -47,9 +48,19 @@ public class CloudServiceController {
         return new ResponseEntity<>("Success logout", HttpStatus.OK);
     }
 
+    /**
+     * Принимаем и сохраняем файл в БД
+     * @return      ответ об результате сохранения
+     */
     @PostMapping("/file")
-    public ResponseEntity<String> uploadFile() {
-        return null;
+    public ResponseEntity<String> uploadFile(@RequestHeader("auth-token") String token,
+                                             @RequestParam("filename") String fileName,
+                                             @RequestPart("file") MultipartFile file) {
+        if(file.isEmpty() || fileName == null || token == null){
+            throw new ErrorInputDataException();
+        }
+        cloudServiceService.saveFile(token, fileName, file);
+        return new ResponseEntity<>("Success upload", HttpStatus.OK);
     }
 
     @DeleteMapping("/file")
@@ -57,9 +68,15 @@ public class CloudServiceController {
         return null;
     }
 
+    //todo скорее всего нужно переделать
     @GetMapping("/file")
-    public ResponseEntity<String> downloadFile() {
-        return null;
+    public ResponseEntity<FileData> downloadFile(@RequestHeader("auth-token") String token,
+                                                 @RequestParam("filename") String fileName) {
+        if(fileName == null || token == null) {
+            throw new ErrorInputDataException();
+        }
+        FileData file = cloudServiceService.getFile(token, fileName);
+        return new ResponseEntity<>(file, HttpStatus.OK);
     }
 
     @PutMapping("/file")
@@ -75,9 +92,8 @@ public class CloudServiceController {
      */
     @GetMapping("/list")
     public ResponseEntity<List<FileInfo>> getAllFiles(@RequestHeader("auth-token") String token,
-                                                      @RequestParam(value = "limit", required = false) Integer limit
-                                                    ) {
-        if (token == null ) {
+                                                      @RequestParam(value = "limit", required = false) Integer limit) {
+        if (token == null) {
             throw new ErrorInputDataException();
         }
         var listFiles = cloudServiceService.getListFiles(token, limit);

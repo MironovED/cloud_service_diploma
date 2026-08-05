@@ -3,18 +3,27 @@ package ru.netology.repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.multipart.MultipartFile;
 import ru.netology.entity.Auth;
 import ru.netology.entity.AuthToken;
-import ru.netology.entity.File;
-import ru.netology.pojo.FileInfo;
+import ru.netology.entity.FileData;
+import ru.netology.exception.ErrorUploadFileException;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+
+import static ru.netology.utils.HashUtil.generateHash;
 
 @Transactional
 @Repository
 public class CloudServiceRepository {
+
+    @Value("${files.path}")
+    private String filesPath;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -37,12 +46,41 @@ public class CloudServiceRepository {
     }
 
     /**
-     * Получить список объектов File из таблицы
-     * @return      List<File>
+     * Сохраняет часть информации в таблицу БД, а сам файл кладет в фс
+     * @param file          файл
+     * @param fileName      имя файла
      */
-    public List<File> getListFiles() {
-        String sqlQuery = "SELECT f FROM File f";
-        var query = entityManager.createQuery(sqlQuery, File.class);
+    public void saveFile(MultipartFile file, String fileName){
+        String path = filesPath + "/" + fileName;
+        try(FileOutputStream fos = new FileOutputStream(path)) {
+            entityManager.persist(new FileData(generateHash(file), path));
+            byte[] bytes = file.getBytes();
+            fos.write(bytes, 0, bytes.length);
+        } catch (IOException e) {
+            throw new ErrorUploadFileException();
+        }
+    }
+
+    /**
+     * Получить объект FileData из таблицы
+     * @param       fileName имя искомого файла
+     * @return      FileData
+     */
+    public FileData getFileByFileName(String fileName) {
+        String sqlQuery = "SELECT f FROM FileData f WHERE f.path = :path";
+        var query = entityManager.createQuery(sqlQuery, FileData.class);
+        String path = filesPath + "/" + fileName;
+        query.setParameter("path", path);
+        return query.getSingleResultOrNull();
+    }
+
+    /**
+     * Получить список объектов FileData из таблицы
+     * @return      List<FileData>
+     */
+    public List<FileData> getListFiles() {
+        String sqlQuery = "SELECT f FROM FileData f";
+        var query = entityManager.createQuery(sqlQuery, FileData.class);
         return query.getResultList();
     }
 
