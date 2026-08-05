@@ -4,12 +4,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.netology.dto.FileDto;
 import ru.netology.entity.Auth;
 import ru.netology.entity.AuthToken;
 import ru.netology.entity.FileData;
 import ru.netology.exception.BadCredentialsException;
 import ru.netology.exception.ErrorInputDataException;
-import ru.netology.pojo.FileInfo;
+import ru.netology.dto.FileInfo;
 import ru.netology.service.CloudServiceService;
 
 import java.util.List;
@@ -63,19 +64,28 @@ public class CloudServiceController {
         return new ResponseEntity<>("Success upload", HttpStatus.OK);
     }
 
+    /**
+     * Удаление файла
+     * @return      результат завершения удаления
+     */
     @DeleteMapping("/file")
-    public ResponseEntity<String> deleteFile() {
-        return null;
+    public ResponseEntity<String> deleteFile(@RequestHeader("auth-token") String token,
+                                             @RequestParam("filename") String fileName) {
+        if(fileName == null || token == null) {
+            throw new ErrorInputDataException();
+        }
+        cloudServiceService.deleteFile(token, fileName);
+        return new ResponseEntity<>("Success deleted", HttpStatus.OK);
     }
 
     //todo скорее всего нужно переделать
     @GetMapping("/file")
-    public ResponseEntity<FileData> downloadFile(@RequestHeader("auth-token") String token,
-                                                 @RequestParam("filename") String fileName) {
+    public ResponseEntity<FileDto> downloadFile(@RequestHeader("auth-token") String token,
+                                                @RequestParam("filename") String fileName) {
         if(fileName == null || token == null) {
             throw new ErrorInputDataException();
         }
-        FileData file = cloudServiceService.getFile(token, fileName);
+        FileDto file = cloudServiceService.getFile(token, fileName);
         return new ResponseEntity<>(file, HttpStatus.OK);
     }
 

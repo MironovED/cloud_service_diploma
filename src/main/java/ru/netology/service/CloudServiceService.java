@@ -2,14 +2,14 @@ package ru.netology.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.netology.dto.FileDto;
 import ru.netology.entity.Auth;
 import ru.netology.entity.FileData;
 import ru.netology.exception.*;
-import ru.netology.pojo.FileInfo;
+import ru.netology.dto.FileInfo;
 import ru.netology.repository.CloudServiceRepository;
 
 import java.io.File;
-import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,20 +62,23 @@ public class CloudServiceService {
             cloudServiceRepository.saveFile(file, fileName);
     }
 
-    public FileData getFile(String rawToken, String fileName) {
+    public FileDto getFile(String rawToken, String fileName) {
         if(!checkToken(getSplitToken(rawToken))) {
             throw new UnauthorizedErrorException();
         }
-        FileData file;
-        try {
-            file = cloudServiceRepository.getFileByFileName(fileName);
-            if (file == null) {
-                throw new ErrorUploadFileException();
-            }
-            return file;
-        } catch (RuntimeException e) {
-            throw new ErrorUploadFileException();
+        return cloudServiceRepository.getFileByFileName(fileName);
+    }
+
+    /**
+     * Удаление файла из БД и фс
+     * @param rawToken
+     * @param fileName
+     */
+    public void deleteFile(String rawToken, String fileName) {
+        if(!checkToken(getSplitToken(rawToken))) {
+            throw new UnauthorizedErrorException();
         }
+        cloudServiceRepository.deleteFileByName(fileName);
     }
 
     /**
@@ -92,11 +95,10 @@ public class CloudServiceService {
         List<FileData> listFile;
         try {
             listFile = cloudServiceRepository.getListFiles();
-            if(listFile.isEmpty()) {
-                throw new ErrorGetFilesException();
-            }
-            for (FileData file : listFile) {
-                listFileInfo.add(convertFromFileToFileInfo(file));
+            if(!listFile.isEmpty()) {
+                for (FileData file : listFile) {
+                    listFileInfo.add(convertFromFileToFileInfo(file));
+                }
             }
             if(limit != null) {
                 listFileInfo = listFileInfo.stream().limit(3).toList();

@@ -1,9 +1,9 @@
-package ru.netology.pojo;
+package ru.netology.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Информация о файле, передаваемая клиенту
+ * Информация о файле, передаваемая клиенту для получения списка файлов
  */
 public class FileInfo {                 //todo переделать
     /** Имя файла, хранящийся в файловой системе */

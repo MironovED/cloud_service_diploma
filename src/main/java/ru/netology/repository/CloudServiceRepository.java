@@ -5,14 +5,21 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.ErrorResponseException;
 import org.springframework.web.multipart.MultipartFile;
+import ru.netology.dto.FileDto;
 import ru.netology.entity.Auth;
 import ru.netology.entity.AuthToken;
 import ru.netology.entity.FileData;
+import ru.netology.exception.ErrorDeleteFileException;
+import ru.netology.exception.ErrorGetFilesException;
 import ru.netology.exception.ErrorUploadFileException;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,12 +73,34 @@ public class CloudServiceRepository {
      * @param       fileName имя искомого файла
      * @return      FileData
      */
-    public FileData getFileByFileName(String fileName) {
-        String sqlQuery = "SELECT f FROM FileData f WHERE f.path = :path";
-        var query = entityManager.createQuery(sqlQuery, FileData.class);
+    public FileDto getFileByFileName(String fileName) {
+        try {
+            String sqlQuery = "SELECT f FROM FileData f WHERE f.path = :path";
+            var query = entityManager.createQuery(sqlQuery, FileData.class);
+            String path = filesPath + "/" + fileName;
+            query.setParameter("path", path);
+            FileData fileData = query.getSingleResult();
+            Path pathToFile = Path.of(fileData.getPath());
+            return new FileDto(fileData.getHash(), Files.readAllBytes(pathToFile));
+        } catch (IOException e) {
+            throw new ErrorGetFilesException();
+        }
+    }
+
+    /**
+     * Удалить файл по имени
+     * @param fileName      имя удаляемого файла
+     */
+    public void deleteFileByName(String fileName) {
         String path = filesPath + "/" + fileName;
-        query.setParameter("path", path);
-        return query.getSingleResultOrNull();
+        try {
+            FileData file = entityManager.find(FileData.class, path);
+            entityManager.remove(file);
+            File fileDelete = new File(path);
+            fileDelete.delete();
+        } catch (RuntimeException e) {
+            throw new ErrorDeleteFileException();
+        }
     }
 
     /**

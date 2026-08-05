@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.netology.exception.*;
-import ru.netology.pojo.Error;
+import ru.netology.dto.Error;
 
 @RestControllerAdvice
 public class ExceptionHandlerAdvice {
@@ -33,5 +33,10 @@ public class ExceptionHandlerAdvice {
     @ExceptionHandler(ErrorGetFilesException.class)
     public ResponseEntity<Error> errorGetFilesException() {
         return new ResponseEntity<>(new Error("Error getting file list", 500), HttpStatusCode.valueOf(500));
+    }
+
+    @ExceptionHandler(ErrorDeleteFileException.class)
+    public ResponseEntity<Error> errorDeleteFileException() {
+        return new ResponseEntity<>(new Error("Error delete file", 500), HttpStatusCode.valueOf(500));
     }
 }

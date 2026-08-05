@@ -8,9 +8,9 @@ import jakarta.persistence.Table;
 @Table(name = "\"filesdata\"", schema = "cloudservice")
 public class FileData {
     /** Хэш файла */
-    @Id
     private String hash;
     /** Путь до файла в файловой системе */
+    @Id
     private String path;
 
     public FileData() {

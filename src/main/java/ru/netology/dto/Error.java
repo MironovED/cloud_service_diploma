@@ -1,4 +1,4 @@
-package ru.netology.pojo;
+package ru.netology.dto;
 
 /**
  * Объект ошибки, возвращаемый клиенту
