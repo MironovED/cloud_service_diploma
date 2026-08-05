@@ -68,10 +68,17 @@ public class CloudServiceService {
         return cloudServiceRepository.getFileByFileName(fileName);
     }
 
+    public void editFile(String rawToken, String fileName, String newFileName) {
+        if(!checkToken(getSplitToken(rawToken))) {
+            throw new UnauthorizedErrorException();
+        }
+
+    }
+
     /**
      * Удаление файла из БД и фс
-     * @param rawToken
-     * @param fileName
+     * @param rawToken      токен
+     * @param fileName      имя файла
      */
     public void deleteFile(String rawToken, String fileName) {
         if(!checkToken(getSplitToken(rawToken))) {

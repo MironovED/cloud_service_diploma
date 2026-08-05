@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.netology.dto.EditInfo;
 import ru.netology.entity.Auth;
 import ru.netology.entity.AuthToken;
 import ru.netology.entity.FileData;
@@ -111,9 +112,22 @@ public class CloudServiceController {
         }
     }
 
+    /**
+     * Изменить имя файла
+     * @param token         токен
+     * @param fileName      имя файла
+     * @param editInfo      новое имя файла
+     * @return              результат
+     */
     @PutMapping("/file")
-    public ResponseEntity<String> editFile() {
-        return null;
+    public ResponseEntity<String> editFile(@RequestHeader("auth-token") String token,
+                                           @RequestParam("filename") String fileName,
+                                           @RequestBody EditInfo editInfo) {
+        if(token == null || fileName == null ) {
+            throw new ErrorInputDataException();
+        }
+        cloudServiceService.editFile(token, fileName, editInfo.getName());
+        return new ResponseEntity<>("Success upload", HttpStatus.OK);
     }
 
     /**
