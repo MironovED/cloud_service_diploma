@@ -1,18 +1,25 @@
 package ru.netology.controller;
 
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.netology.dto.FileDto;
 import ru.netology.entity.Auth;
 import ru.netology.entity.AuthToken;
 import ru.netology.entity.FileData;
 import ru.netology.exception.BadCredentialsException;
 import ru.netology.exception.ErrorInputDataException;
 import ru.netology.dto.FileInfo;
+import ru.netology.exception.ErrorUploadFileException;
 import ru.netology.service.CloudServiceService;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 @RestController
@@ -49,20 +56,20 @@ public class CloudServiceController {
         return new ResponseEntity<>("Success logout", HttpStatus.OK);
     }
 
-    /**
-     * Принимаем и сохраняем файл в БД
-     * @return      ответ об результате сохранения
-     */
-    @PostMapping("/file")
-    public ResponseEntity<String> uploadFile(@RequestHeader("auth-token") String token,
-                                             @RequestParam("filename") String fileName,
-                                             @RequestPart("file") MultipartFile file) {
-        if(file.isEmpty() || fileName == null || token == null){
-            throw new ErrorInputDataException();
+        /**
+         * Принимаем и сохраняем файл в БД
+         * @return      ответ об результате сохранения
+         */
+        @PostMapping("/file")
+        public ResponseEntity<String> uploadFile(@RequestHeader("auth-token") String token,
+                                                 @RequestParam("filename") String fileName,
+                                                 @RequestPart("file") MultipartFile file) {
+            if(file.isEmpty() || fileName == null || token == null){
+                throw new ErrorInputDataException();
+            }
+            cloudServiceService.saveFile(token, fileName, file);
+            return new ResponseEntity<>("Success upload", HttpStatus.OK);
         }
-        cloudServiceService.saveFile(token, fileName, file);
-        return new ResponseEntity<>("Success upload", HttpStatus.OK);
-    }
 
     /**
      * Удаление файла
@@ -78,15 +85,30 @@ public class CloudServiceController {
         return new ResponseEntity<>("Success deleted", HttpStatus.OK);
     }
 
-    //todo скорее всего нужно переделать
+    /**
+     * @param token         токен
+     * @param fileName      имя файла
+     * @return              поток InputStreamResource
+     */
     @GetMapping("/file")
-    public ResponseEntity<FileDto> downloadFile(@RequestHeader("auth-token") String token,
-                                                @RequestParam("filename") String fileName) {
+    public ResponseEntity<InputStreamResource> downloadFile(@RequestHeader("auth-token") String token,
+                                                            @RequestParam("filename") String fileName) {
         if(fileName == null || token == null) {
             throw new ErrorInputDataException();
         }
-        FileDto file = cloudServiceService.getFile(token, fileName);
-        return new ResponseEntity<>(file, HttpStatus.OK);
+        FileData file = cloudServiceService.getFile(token, fileName);
+        try {
+            Path path = Path.of(file.getPath());
+            InputStream inputStream = Files.newInputStream(path);
+            InputStreamResource resource = new InputStreamResource(inputStream);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentLength(Files.size(path));
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            return ResponseEntity.ok().headers(headers).body(resource);
+        } catch (IOException e) {
+            throw new ErrorUploadFileException();
+        }
     }
 
     @PutMapping("/file")
@@ -109,5 +131,4 @@ public class CloudServiceController {
         var listFiles = cloudServiceService.getListFiles(token, limit);
         return new ResponseEntity<>(listFiles, HttpStatus.OK);
     }
-
 }

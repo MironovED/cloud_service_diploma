@@ -2,7 +2,6 @@ package ru.netology.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import ru.netology.dto.FileDto;
 import ru.netology.entity.Auth;
 import ru.netology.entity.FileData;
 import ru.netology.exception.*;
@@ -62,7 +61,7 @@ public class CloudServiceService {
             cloudServiceRepository.saveFile(file, fileName);
     }
 
-    public FileDto getFile(String rawToken, String fileName) {
+    public FileData getFile(String rawToken, String fileName) {
         if(!checkToken(getSplitToken(rawToken))) {
             throw new UnauthorizedErrorException();
         }
