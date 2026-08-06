@@ -49,7 +49,7 @@ public class CloudServiceController {
     /**
      * Выход из текущий сессии клиента
      * @param token     действующий токен
-     * @return
+     * @return          результат операции
      */
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("auth-token") String token) {
@@ -57,20 +57,20 @@ public class CloudServiceController {
         return new ResponseEntity<>("Success logout", HttpStatus.OK);
     }
 
-        /**
-         * Принимаем и сохраняем файл в БД
-         * @return      ответ об результате сохранения
-         */
-        @PostMapping("/file")
-        public ResponseEntity<String> uploadFile(@RequestHeader("auth-token") String token,
-                                                 @RequestParam("filename") String fileName,
-                                                 @RequestPart("file") MultipartFile file) {
-            if(file.isEmpty() || fileName == null || token == null){
-                throw new ErrorInputDataException();
-            }
-            cloudServiceService.saveFile(token, fileName, file);
-            return new ResponseEntity<>("Success upload", HttpStatus.OK);
+    /**
+     * Принимаем и сохраняем файл в БД
+     * @return      ответ об результате сохранения
+     */
+    @PostMapping("/file")
+    public ResponseEntity<String> uploadFile(@RequestHeader("auth-token") String token,
+                                             @RequestParam("filename") String fileName,
+                                             @RequestPart("file") MultipartFile file) {
+        if(file.isEmpty() || fileName == null || token == null){
+            throw new ErrorInputDataException();
         }
+        cloudServiceService.saveFile(token, fileName, file);
+        return new ResponseEntity<>("Success upload", HttpStatus.OK);
+    }
 
     /**
      * Удаление файла

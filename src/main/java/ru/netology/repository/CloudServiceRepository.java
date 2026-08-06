@@ -16,6 +16,8 @@ import ru.netology.exception.ErrorUploadFileException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,6 +65,30 @@ public class CloudServiceRepository {
             throw new ErrorUploadFileException();
         }
         //todo добавить обработку, если мы пытаемся загрузить два одинаковых файла.
+    }
+
+    /**
+     * Переименовывает файл в фс и меняет path в БД
+     * @param name          текущее имя файла
+     * @param newName       новое имя файла
+     */
+    public void updateFileByName(String name, String newName) {
+        String currentPath = filesPath + "/" + name;
+        String newPath = filesPath + "/" + newName;
+        String sqlQuery = "UPDATE FileData f SET f.path = :new WHERE f.path = :old";
+        var query = entityManager.createQuery(sqlQuery);
+        query.setParameter("new", newPath);
+        query.setParameter("old", currentPath);
+        query.executeUpdate();
+        entityManager.clear();
+
+        Path currentFile = Path.of(currentPath);
+        Path newFile = Path.of(newPath);
+        try {
+            Files.move(currentFile, newFile);
+        } catch (IOException e) {
+            throw new ErrorUploadFileException();
+        }
     }
 
     /**

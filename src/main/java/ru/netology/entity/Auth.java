@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotBlank;
 @Entity
 @Table(schema = "cloudservice")
 public class Auth {
-
     /** Логин пользователя */
     @NotBlank
     @Id

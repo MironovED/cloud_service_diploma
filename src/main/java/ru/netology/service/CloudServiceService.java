@@ -68,11 +68,21 @@ public class CloudServiceService {
         return cloudServiceRepository.getFileByFileName(fileName);
     }
 
+    /**
+     * Меняем у существующего файла его название
+     * @param rawToken      токен
+     * @param fileName      действующее имя
+     * @param newFileName   новое имя
+     */
     public void editFile(String rawToken, String fileName, String newFileName) {
         if(!checkToken(getSplitToken(rawToken))) {
             throw new UnauthorizedErrorException();
         }
-
+        try {
+            cloudServiceRepository.updateFileByName(fileName, newFileName);
+        } catch (RuntimeException e) {
+            throw new ErrorUploadFileException();
+        }
     }
 
     /**
