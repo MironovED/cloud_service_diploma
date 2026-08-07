@@ -57,6 +57,15 @@ public class CloudServiceRepository {
      */
     public void saveFile(MultipartFile file, String fileName){
         String path = filesPath + "/" + fileName;
+        File dir = new File(filesPath);
+        if(!dir.exists()){
+            if(!dir.mkdir()) {
+                throw new ErrorUploadFileException();
+            }
+        }
+        if(Files.exists(Path.of(path))){
+            throw new ErrorUploadFileException();
+        }
         try(FileOutputStream fos = new FileOutputStream(path)) {
             entityManager.persist(new FileData(generateHash(file), path));
             byte[] bytes = file.getBytes();
@@ -64,7 +73,6 @@ public class CloudServiceRepository {
         } catch (IOException e) {
             throw new ErrorUploadFileException();
         }
-        //todo добавить обработку, если мы пытаемся загрузить два одинаковых файла.
     }
 
     /**
