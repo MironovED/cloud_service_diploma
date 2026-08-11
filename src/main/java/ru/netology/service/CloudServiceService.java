@@ -12,6 +12,7 @@ import java.io.File;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -116,10 +117,7 @@ public class CloudServiceService {
                     listFileInfo.add(convertFromFileToFileInfo(file));
                 }
             }
-            if(limit != null) {
-                listFileInfo = listFileInfo.stream().limit(3).toList();
-            }
-            return listFileInfo;
+            return listFileInfo.stream().limit(Objects.requireNonNullElse(limit, 3)).toList();
         } catch (RuntimeException e) {
             throw new ErrorGetFilesException();
         }
