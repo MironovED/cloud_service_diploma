@@ -17,6 +17,14 @@ public class Auth {
     @NotBlank
     String password;
 
+    public Auth(String login, String password) {
+        this.login = login;
+        this.password = password;
+    }
+
+    public Auth() {
+    }
+
     public String getPassword() {
         return password;
     }
