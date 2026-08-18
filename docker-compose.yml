@@ -1,6 +1,24 @@
 version: '3'
 
 services:
+  cloud-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cloud-service-diploma:latest
+    container_name: cloud_service_diploma_app
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
   postgres:
     image: postgres:latest
     container_name: postgres_container
