@@ -87,6 +87,7 @@ public class CloudServiceController {
     }
 
     /**
+     * Загрузить файл с сервера
      * @param token         токен
      * @param fileName      имя файла
      * @return              поток InputStreamResource
