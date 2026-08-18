@@ -6,7 +6,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
-@Table(schema = "cloudservice")
+@Table(schema = "cloudservice", name = "auth")
 public class Auth {
     /** Логин пользователя */
     @NotBlank
