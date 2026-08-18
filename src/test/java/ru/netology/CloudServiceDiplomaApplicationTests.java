@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -33,8 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"spring.jpa.hibernate.ddl-auto=none","spring.jpa.properties.hibernate.hbm2ddl.create_namespaces=true"})
-@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-		scripts = "/sql/init-data.sql")
+//@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
+//		scripts = "/sql/init-data.sql")
 class CloudServiceDiplomaApplicationTests {
 	@LocalServerPort
 	private Integer port;
@@ -48,7 +47,7 @@ class CloudServiceDiplomaApplicationTests {
 	@Autowired
 	private TestRestTemplate restTemplate;
 
-	private static PostgreSQLContainer<?> db = new PostgreSQLContainer<>("postgres:latest")
+	private static final PostgreSQLContainer<?> db = new PostgreSQLContainer<>("postgres:latest")
 			.withDatabaseName("test")
 			.withUsername("postgres")
 			.withPassword("postgres");
@@ -86,8 +85,8 @@ class CloudServiceDiplomaApplicationTests {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 
 		Map<String, String> requestBody = new HashMap<>();
-		requestBody.put("login", "test");
-		requestBody.put("password", "test123");
+		requestBody.put("login", "test@test.com");
+		requestBody.put("password", "qwerty12345");
 		HttpEntity<Map<String, String>> requestEntityLogin = new HttpEntity<>(requestBody, headers);
 
 		//авторизуемся
