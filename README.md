@@ -7,26 +7,26 @@ ___
 
 **Эндпоинты**
 
-1. cloud/files/{filename} - GET - возвращает файл
-2. cloud/files - POST - сохраняет файл
-3. cloud/files/{filename} - DELETE - удаляет файл
-4. cloud/files/{filename} - PUT - изменяет файл
-5. cloud/list - GET - возвращает список файлов
+1. **cloud/files/{filename}** - GET - возвращает файл
+2. **cloud/files** - POST - сохраняет файл
+3. **cloud/files/{filename}** - DELETE - удаляет файл
+4. **cloud/files/{filename}** - PUT - изменяет файл
+5. **cloud/list** - GET - возвращает список файлов
 
 **Структура**
 
 | path                                 | Описание                                                       |
 |:-------------------------------------|:---------------------------------------------------------------|
-| src/main/java/ru/netology/advice     | обработчик ошибок                                              |
-| src/main/java/ru/netology/config     | веб конфигурация (в allowedOrigins передает адрес веб сервера) |
-| src/main/java/ru/netology/controller | контроллеры                                                    |
-| src/main/java/ru/netology/dto        | DTO                                                            |
-| src/main/java/ru/netology/entity     | сущности БД                                                    |
-| src/main/java/ru/netology/exception  | кастомные исключения                                           |
-| src/main/java/ru/netology/repository | репозиторий для работы с БД                                    |
-| src/main/java/ru/netology/service    | сервис облачного хранилища                                     |
-| src/main/java/ru/netology/utils      | лежит единственный утилитный класс для генерации хэш-кода      |
-| src/test/java/ru/netology            | интеграционные и юнит тесты                                    |
+| _src/main/java/ru/netology/advice_     | обработчик ошибок                                              |
+| _src/main/java/ru/netology/config_     | веб конфигурация (в allowedOrigins передает адрес веб сервера) |
+| _src/main/java/ru/netology/controller_ | контроллеры                                                    |
+| _src/main/java/ru/netology/dto_        | DTO                                                            |
+| _src/main/java/ru/netology/entity_     | сущности БД                                                    |
+| _src/main/java/ru/netology/exception_  | кастомные исключения                                           |
+| _src/main/java/ru/netology/repository_ | репозиторий для работы с БД                                    |
+| _src/main/java/ru/netology/service_    | сервис облачного хранилища                                     |
+| _src/main/java/ru/netology/utils_      | лежит единственный утилитный класс для генерации хэш-кода      |
+| _src/test/java/ru/netology_            | интеграционные и юнит тесты                                    |
 
 
 ### Как запустить
