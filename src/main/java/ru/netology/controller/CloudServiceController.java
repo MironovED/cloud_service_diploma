@@ -1,6 +1,5 @@
 package ru.netology.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
@@ -11,12 +10,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.netology.dto.EditInfo;
+import ru.netology.dto.FileInfo;
 import ru.netology.entity.Auth;
 import ru.netology.entity.AuthToken;
 import ru.netology.entity.FileData;
 import ru.netology.exception.BadCredentialsException;
 import ru.netology.exception.ErrorInputDataException;
-import ru.netology.dto.FileInfo;
 import ru.netology.exception.ErrorUploadFileException;
 import ru.netology.exception.UnauthorizedErrorException;
 import ru.netology.service.CloudServiceService;
@@ -27,11 +26,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping("/cloud")
 public class CloudServiceController {
     private static final Logger log = LoggerFactory.getLogger(CloudServiceController.class);
+
     private CloudServiceService cloudServiceService;
 
     public CloudServiceController(CloudServiceService cloudServiceService) {
@@ -46,10 +45,10 @@ public class CloudServiceController {
     @PostMapping("/login")
     public ResponseEntity<AuthToken> authorization(@RequestBody Auth auth) {
         log.info("POST /login {}", auth);
-            var token = cloudServiceService.login(auth);
-            if(token.isEmpty()){
-                throw new BadCredentialsException();
-            }
+        var token = cloudServiceService.login(auth);
+        if(token.isEmpty()){
+            throw new BadCredentialsException();
+        }
         return new ResponseEntity<>(new AuthToken(token.get()), HttpStatus.OK);
     }
 

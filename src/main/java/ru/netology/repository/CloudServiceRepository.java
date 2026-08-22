@@ -3,7 +3,6 @@ package ru.netology.repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,10 +27,9 @@ import static ru.netology.utils.HashUtil.generateHash;
 
 @Transactional
 @Repository
-@Slf4j
 public class CloudServiceRepository {
-
     private static final Logger log = LoggerFactory.getLogger(CloudServiceRepository.class);
+
     @Value("${files.path}")
     private String filesPath;
 
