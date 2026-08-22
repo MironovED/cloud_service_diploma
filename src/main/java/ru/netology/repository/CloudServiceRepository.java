@@ -3,6 +3,9 @@ package ru.netology.repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,8 +28,10 @@ import static ru.netology.utils.HashUtil.generateHash;
 
 @Transactional
 @Repository
+@Slf4j
 public class CloudServiceRepository {
 
+    private static final Logger log = LoggerFactory.getLogger(CloudServiceRepository.class);
     @Value("${files.path}")
     private String filesPath;
 
@@ -62,6 +67,7 @@ public class CloudServiceRepository {
             if(!dir.mkdir()) {
                 throw new ErrorUploadFileException();
             }
+            log.info("Создан каталог для сохраненияфайлов: {}", filesPath);
         }
         if(Files.exists(Path.of(path))){
             throw new ErrorUploadFileException();
@@ -70,6 +76,7 @@ public class CloudServiceRepository {
             entityManager.persist(new FileData(generateHash(file), path));
             byte[] bytes = file.getBytes();
             fos.write(bytes, 0, bytes.length);
+            log.info("Файл успешно сохранен в хранилище {}", path);
         } catch (IOException e) {
             throw new ErrorUploadFileException();
         }
@@ -94,6 +101,7 @@ public class CloudServiceRepository {
         Path newFile = Path.of(newPath);
         try {
             Files.move(currentFile, newFile);
+            log.info("Файл успешно переименован из {} в {}", currentPath, newPath);
         } catch (IOException e) {
             throw new ErrorUploadFileException();
         }
@@ -110,6 +118,8 @@ public class CloudServiceRepository {
             var query = entityManager.createQuery(sqlQuery, FileData.class);
             String path = filesPath + "/" + fileName;
             query.setParameter("path", path);
+            var result = query.getSingleResult();
+            log.info("Найден файл : {}", result);
             return query.getSingleResult();
         } catch (RuntimeException e) {
             throw new ErrorGetFilesException();
@@ -127,6 +137,7 @@ public class CloudServiceRepository {
             entityManager.remove(file);
             File fileDelete = new File(path);
             fileDelete.delete();
+            log.info("Файл {} удален", fileName);
         } catch (RuntimeException e) {
             throw new ErrorDeleteFileException();
         }
@@ -139,7 +150,9 @@ public class CloudServiceRepository {
     public List<FileData> getListFiles() {
         String sqlQuery = "SELECT f FROM FileData f";
         var query = entityManager.createQuery(sqlQuery, FileData.class);
-        return query.getResultList();
+        var result = query.getResultList();
+        log.info("Список файлов в БД: {}", result.toArray());
+        return result;
     }
 
     /**

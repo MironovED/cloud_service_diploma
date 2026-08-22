@@ -1,5 +1,8 @@
 package ru.netology.controller;
 
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,9 +27,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/cloud")
 public class CloudServiceController {
+    private static final Logger log = LoggerFactory.getLogger(CloudServiceController.class);
     private CloudServiceService cloudServiceService;
 
     public CloudServiceController(CloudServiceService cloudServiceService) {
@@ -40,6 +45,7 @@ public class CloudServiceController {
      */
     @PostMapping("/login")
     public ResponseEntity<AuthToken> authorization(@RequestBody Auth auth) {
+        log.info("POST /login {}", auth);
             var token = cloudServiceService.login(auth);
             if(token.isEmpty()){
                 throw new BadCredentialsException();
@@ -54,6 +60,7 @@ public class CloudServiceController {
      */
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("auth-token") String token) {
+        log.info("POST /logout");
         cloudServiceService.logout(token);
         return new ResponseEntity<>("Success logout", HttpStatus.OK);
     }
@@ -66,6 +73,7 @@ public class CloudServiceController {
     public ResponseEntity<String> uploadFile(@RequestHeader("auth-token") String token,
                                              @RequestParam("filename") String fileName,
                                              @RequestPart("file") MultipartFile file) {
+        log.info("POST /file - Uploading file: {}", fileName);
         if(file.isEmpty() || fileName == null || token == null){
             throw new ErrorInputDataException();
         }
@@ -83,6 +91,7 @@ public class CloudServiceController {
     @DeleteMapping("/file")
     public ResponseEntity<String> deleteFile(@RequestHeader("auth-token") String token,
                                              @RequestParam("filename") String fileName) {
+        log.info("POST /file - Deleting file: {}", fileName);
         if(fileName == null || token == null) {
             throw new ErrorInputDataException();
         }
@@ -102,6 +111,7 @@ public class CloudServiceController {
     @GetMapping("/file")
     public ResponseEntity<InputStreamResource> downloadFile(@RequestHeader("auth-token") String token,
                                                             @RequestParam("filename") String fileName) {
+        log.info("POST /file - Downloading file: {}", fileName);
         if(fileName == null || token == null) {
             throw new ErrorInputDataException();
         }
@@ -134,6 +144,7 @@ public class CloudServiceController {
     public ResponseEntity<String> editFile(@RequestHeader("auth-token") String token,
                                            @RequestParam("filename") String fileName,
                                            @RequestBody EditInfo editInfo) {
+        log.info("PUT /file - Editing file: {}", fileName);
         if(token == null || fileName == null ) {
             throw new ErrorInputDataException();
         }
@@ -153,6 +164,7 @@ public class CloudServiceController {
     @GetMapping("/list")
     public ResponseEntity<List<FileInfo>> getAllFiles(@RequestHeader("Auth-Token") String token,
                                                       @RequestParam(value = "limit", required = false) Integer limit) {
+        log.info("GET /list - Number of output lines: {}", limit);
         if (token == null) {
             throw new ErrorInputDataException();
         }
