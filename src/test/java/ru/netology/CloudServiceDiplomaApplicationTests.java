@@ -32,8 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {"spring.jpa.hibernate.ddl-auto=none","spring.jpa.properties.hibernate.hbm2ddl.create_namespaces=true"})
-//@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD,
-//		scripts = "/sql/init-data.sql")
 class CloudServiceDiplomaApplicationTests {
 	@LocalServerPort
 	private Integer port;
