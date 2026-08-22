@@ -23,18 +23,11 @@ class CloudServiceServiceTest {
     private CloudServiceRepository mockRepository = Mockito.mock(CloudServiceRepository.class);
 
     @Test
-    void shouldReturnUnauthorizedException() {
-        CloudServiceService cloudServiceService = new CloudServiceService(mockRepository);
-        assertThrows(UnauthorizedErrorException.class, () -> cloudServiceService.getListFiles(rawToken, null));
-    }
-
-    @Test
     void shouldReturnErrorGetFilesException() {
         CloudServiceService cloudServiceService = new CloudServiceService(mockRepository);
         CloudServiceService mockService = Mockito.spy(cloudServiceService);
-        Mockito.doReturn(true).when(mockService).checkToken(token);
         Mockito.doThrow(new RuntimeException()).when(mockRepository).getListFiles();
-        assertThrows(ErrorGetFilesException.class, () -> mockService.getListFiles(rawToken, null));
+        assertThrows(ErrorGetFilesException.class, () -> mockService.getListFiles(null));
     }
 
     @Test
@@ -48,9 +41,7 @@ class CloudServiceServiceTest {
         Mockito.when(mockRepository.getListFiles()).thenReturn(listFiles);
         CloudServiceService cloudServiceService = new CloudServiceService(mockRepository);
         CloudServiceService mockService = Mockito.spy(cloudServiceService);
-        Mockito.doReturn(true).when(mockService).checkToken(token);
-
-        var result = mockService.getListFiles(rawToken, null);
+        var result = mockService.getListFiles(null);
         assertEquals(3, result.size());
     }
 
@@ -67,9 +58,7 @@ class CloudServiceServiceTest {
         Mockito.when(mockRepository.getListFiles()).thenReturn(listFiles);
         CloudServiceService cloudServiceService = new CloudServiceService(mockRepository);
         CloudServiceService mockService = Mockito.spy(cloudServiceService);
-        Mockito.doReturn(true).when(mockService).checkToken(token);
-
-        var result = mockService.getListFiles(rawToken, 5);
+        var result = mockService.getListFiles(5);
         assertEquals(5, result.size());
     }
 

@@ -51,34 +51,28 @@ public class CloudServiceService {
 
     /**
      * Сохранить файл в БД
-     * @param rawToken      токен
      * @param fileName      имя файла
      * @param file          файл
      */
-    public void saveFile(String rawToken, String fileName, MultipartFile file){
-        if(!checkToken(getSplitToken(rawToken))) {
-            throw new UnauthorizedErrorException();
-        }
+    public void saveFile(String fileName, MultipartFile file){
             cloudServiceRepository.saveFile(file, fileName);
     }
 
-    public FileData getFile(String rawToken, String fileName) {
-        if(!checkToken(getSplitToken(rawToken))) {
-            throw new UnauthorizedErrorException();
-        }
+    /**
+     * Выгрузка файла из БД
+     * @param   fileName      имя файла
+     * @return  FileData      дто
+     */
+    public FileData getFile(String fileName) {
         return cloudServiceRepository.getFileByFileName(fileName);
     }
 
     /**
      * Меняем у существующего файла его название
-     * @param rawToken      токен
      * @param fileName      действующее имя
      * @param newFileName   новое имя
      */
-    public void editFile(String rawToken, String fileName, String newFileName) {
-        if(!checkToken(getSplitToken(rawToken))) {
-            throw new UnauthorizedErrorException();
-        }
+    public void editFile(String fileName, String newFileName) {
         try {
             cloudServiceRepository.updateFileByName(fileName, newFileName);
         } catch (RuntimeException e) {
@@ -88,27 +82,19 @@ public class CloudServiceService {
 
     /**
      * Удаление файла из БД и фс
-     * @param rawToken      токен
      * @param fileName      имя файла
      */
-    public void deleteFile(String rawToken, String fileName) {
-        if(!checkToken(getSplitToken(rawToken))) {
-            throw new UnauthorizedErrorException();
-        }
+    public void deleteFile(String fileName) {
         cloudServiceRepository.deleteFileByName(fileName);
     }
 
     /**
      * получить список файлов
-     * @param rawToken      токен
      * @param limit         количество выводимых объектов
      * @return              List<FileInfo>
      */
-    public List<FileInfo> getListFiles(String rawToken, Integer limit) {
+    public List<FileInfo> getListFiles(Integer limit) {
         List<FileInfo> listFileInfo = new ArrayList<>();
-        if(!checkToken(getSplitToken(rawToken))) {
-            throw new UnauthorizedErrorException();
-        }
         List<FileData> listFile;
         try {
             listFile = cloudServiceRepository.getListFiles();
@@ -160,11 +146,10 @@ public class CloudServiceService {
 
     /**
      * Проверка существования токена
-     * @param token      токен из запроса
+     * @param rawToken      токен из запроса
      * @return              true or false
      */
-    public Boolean checkToken(String token) {
-        return cloudServiceRepository.checkToken(token);
+    public Boolean checkToken(String rawToken) {
+        return cloudServiceRepository.checkToken(getSplitToken(rawToken));
     }
-
 }

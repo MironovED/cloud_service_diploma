@@ -15,6 +15,7 @@ import ru.netology.exception.BadCredentialsException;
 import ru.netology.exception.ErrorInputDataException;
 import ru.netology.dto.FileInfo;
 import ru.netology.exception.ErrorUploadFileException;
+import ru.netology.exception.UnauthorizedErrorException;
 import ru.netology.service.CloudServiceService;
 
 import java.io.IOException;
@@ -68,7 +69,10 @@ public class CloudServiceController {
         if(file.isEmpty() || fileName == null || token == null){
             throw new ErrorInputDataException();
         }
-        cloudServiceService.saveFile(token, fileName, file);
+        if(!cloudServiceService.checkToken(token)) {
+            throw new UnauthorizedErrorException();
+        }
+        cloudServiceService.saveFile(fileName, file);
         return new ResponseEntity<>("Success upload", HttpStatus.OK);
     }
 
@@ -82,7 +86,10 @@ public class CloudServiceController {
         if(fileName == null || token == null) {
             throw new ErrorInputDataException();
         }
-        cloudServiceService.deleteFile(token, fileName);
+        if(!cloudServiceService.checkToken(token)) {
+            throw new UnauthorizedErrorException();
+        }
+        cloudServiceService.deleteFile(fileName);
         return new ResponseEntity<>("Success deleted", HttpStatus.OK);
     }
 
@@ -98,7 +105,10 @@ public class CloudServiceController {
         if(fileName == null || token == null) {
             throw new ErrorInputDataException();
         }
-        FileData file = cloudServiceService.getFile(token, fileName);
+        if(!cloudServiceService.checkToken(token)) {
+            throw new UnauthorizedErrorException();
+        }
+        FileData file = cloudServiceService.getFile(fileName);
         try {
             Path path = Path.of(file.getPath());
             InputStream inputStream = Files.newInputStream(path);
@@ -127,7 +137,10 @@ public class CloudServiceController {
         if(token == null || fileName == null ) {
             throw new ErrorInputDataException();
         }
-        cloudServiceService.editFile(token, fileName, editInfo.getName());
+        if(!cloudServiceService.checkToken(token)) {
+            throw new UnauthorizedErrorException();
+        }
+        cloudServiceService.editFile(fileName, editInfo.getName());
         return new ResponseEntity<>("Success upload", HttpStatus.OK);
     }
 
@@ -138,12 +151,15 @@ public class CloudServiceController {
      * @return          список файлов
      */
     @GetMapping("/list")
-    public ResponseEntity<List<FileInfo>> getAllFiles(@RequestHeader("auth-token") String token,
+    public ResponseEntity<List<FileInfo>> getAllFiles(@RequestHeader("Auth-Token") String token,
                                                       @RequestParam(value = "limit", required = false) Integer limit) {
         if (token == null) {
             throw new ErrorInputDataException();
         }
-        var listFiles = cloudServiceService.getListFiles(token, limit);
+        if(!cloudServiceService.checkToken(token)) {
+            throw new UnauthorizedErrorException();
+        }
+        var listFiles = cloudServiceService.getListFiles(limit);
         return new ResponseEntity<>(listFiles, HttpStatus.OK);
     }
 }

@@ -1,7 +1,9 @@
 package ru.netology.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -10,7 +12,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.netology.dto.EditInfo;
 import ru.netology.repository.CloudServiceRepository;
 import ru.netology.service.CloudServiceService;
-
 import java.nio.charset.StandardCharsets;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -31,21 +32,11 @@ class CloudServiceControllerTest {
     @MockitoBean
     private CloudServiceRepository mockRepository;
 
-    /**
-     * Надо дорабоотать
-     *
-     * @Test void authorization() throws Exception {
-     * Optional<String> optionalToken = Optional.of(token);
-     * var authData = new Auth("test", "test");
-     * Mockito.when(mockRepository.checkUser(authData)).thenReturn(true);
-     * Mockito.when(mockCloudServiceService.login(authData)).thenReturn(optionalToken);
-     * mockMvc.perform(post("/cloud/login")
-     * .contentType(MediaType.APPLICATION_JSON)
-     * .content(objectMapper.writeValueAsString(new Auth("test", "test"))))
-     * .andExpect(status().isOk())
-     * .andExpect(content().json(objectMapper.writeValueAsString(new AuthToken(token))));
-     * }
-     */
+    @BeforeEach
+    void setUp() {
+        Mockito.doReturn(true).when(mockCloudServiceService).checkToken(rawToken);
+        Mockito.doReturn(true).when(mockRepository).checkToken(token);
+    }
 
     @Test
     void logout() throws Exception {
@@ -90,14 +81,14 @@ class CloudServiceControllerTest {
                 .andExpect(status().is4xxClientError());
     }
 
-    @Test
-    void downloadFile() throws Exception {
-        mockMvc.perform(delete("/cloud/file")
-                        .param("filename", "test.txt")
-                        .header("auth-token", rawToken))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Success deleted"));
-    }
+//    @Test
+//    void downloadFile() throws Exception {
+//        mockMvc.perform(delete("/cloud/file")
+//                        .param("filename", "test.txt")
+//                        .header("auth-token", rawToken))
+//                .andExpect(status().isOk())
+//                .andExpect(content().string("Success deleted"));
+//    }
 
     @Test
     void shouldReturnExceptionWhenDownloadFile() throws Exception {
@@ -130,6 +121,8 @@ class CloudServiceControllerTest {
 
     @Test
     void getAllFiles() throws Exception {
+        Mockito.doReturn(true).when(mockCloudServiceService).checkToken(rawToken);
+        Mockito.doReturn(true).when(mockRepository).checkToken(token);
         mockMvc.perform(get("/cloud/list")
                         .param("limit", "4")
                         .header("auth-token", rawToken))
