@@ -27,26 +27,11 @@ class CloudServiceServiceTest {
         CloudServiceService cloudServiceService = new CloudServiceService(mockRepository);
         CloudServiceService mockService = Mockito.spy(cloudServiceService);
         Mockito.doThrow(new RuntimeException()).when(mockRepository).getListFiles();
-        assertThrows(ErrorGetFilesException.class, () -> mockService.getListFiles(null));
+        assertThrows(ErrorGetFilesException.class, mockService::getListFiles);
     }
 
     @Test
-    void shouldGetListFilesWhenLimitIsNull() {
-        List<FileData> listFiles = new ArrayList<>();
-        listFiles.add(new FileData("one.txt", "one.txt"));
-        listFiles.add(new FileData("two.txt", "two.txt"));
-        listFiles.add(new FileData("three.txt", "three.txt"));
-        listFiles.add(new FileData("fore.txt", "fore.txt"));
-
-        Mockito.when(mockRepository.getListFiles()).thenReturn(listFiles);
-        CloudServiceService cloudServiceService = new CloudServiceService(mockRepository);
-        CloudServiceService mockService = Mockito.spy(cloudServiceService);
-        var result = mockService.getListFiles(null);
-        assertEquals(3, result.size());
-    }
-
-    @Test
-    void shouldGetListFilesWhenLimit5() {
+    void shouldGetListFiles() {
         List<FileData> listFiles = new ArrayList<>();
         listFiles.add(new FileData("one.txt", "one.txt"));
         listFiles.add(new FileData("two.txt", "two.txt"));
@@ -58,8 +43,8 @@ class CloudServiceServiceTest {
         Mockito.when(mockRepository.getListFiles()).thenReturn(listFiles);
         CloudServiceService cloudServiceService = new CloudServiceService(mockRepository);
         CloudServiceService mockService = Mockito.spy(cloudServiceService);
-        var result = mockService.getListFiles(5);
-        assertEquals(5, result.size());
+        var result = mockService.getListFiles();
+        assertEquals(6, result.size());
     }
 
     @Test

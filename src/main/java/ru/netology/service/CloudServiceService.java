@@ -90,20 +90,11 @@ public class CloudServiceService {
 
     /**
      * получить список файлов
-     * @param limit         количество выводимых объектов
-     * @return              List<FileInfo>
+     * @return              List<FileData>
      */
-    public List<FileInfo> getListFiles(Integer limit) {
-        List<FileInfo> listFileInfo = new ArrayList<>();
-        List<FileData> listFile;
+    public List<FileData> getListFiles() {
         try {
-            listFile = cloudServiceRepository.getListFiles();
-            if(!listFile.isEmpty()) {
-                for (FileData file : listFile) {
-                    listFileInfo.add(convertFromFileToFileInfo(file));
-                }
-            }
-            return listFileInfo.stream().limit(Objects.requireNonNullElse(limit, 3)).toList();
+            return cloudServiceRepository.getListFiles();
         } catch (RuntimeException e) {
             throw new ErrorGetFilesException();
         }

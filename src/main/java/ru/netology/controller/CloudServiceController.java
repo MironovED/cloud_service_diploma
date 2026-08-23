@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/cloud")
@@ -170,7 +172,14 @@ public class CloudServiceController {
         if(!cloudServiceService.checkToken(token)) {
             throw new UnauthorizedErrorException();
         }
-        var listFiles = cloudServiceService.getListFiles(limit);
-        return new ResponseEntity<>(listFiles, HttpStatus.OK);
+        List<FileData> listFiles = cloudServiceService.getListFiles();
+        List<FileInfo> listFileInfo = new ArrayList<>();
+        if (!listFiles.isEmpty()) {
+            for (FileData file : listFiles) {
+                listFileInfo.add(cloudServiceService.convertFromFileToFileInfo(file));
+            }
+        }
+        var result = listFileInfo.stream().limit(Objects.requireNonNullElse(limit, 3)).toList();
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }
